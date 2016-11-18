@@ -107,15 +107,26 @@ func ReadPluginXML(pluginDirectory string) (p PluginXML, err error) {
     return
 }
 
+func GetFoldersToPack(args CommandLineArguments) []string {
+    if args["folders"] != "" {
+        folders := strings.Split(args["folders"],",")
+        return folders
+    } else {
+        return []string{"lib", "dsl", "t", "htdocs", "pages", "META-INF"}
+    }
+}
+
 func GetCommandLineArguments() CommandLineArguments {
     versionPtr := flag.String("plugin-version", "", "Plugin Version")
     namePtr := flag.String("plugin-name", "", "Plugin name")
     pluginDirPtr := flag.String("plugin-dir", "", "Plugin directory")
+    foldersToPackPtr := flag.String("folders", "", "Folders to pack")
     flag.Parse()
     m := make(CommandLineArguments)
 
     m["version"] = *versionPtr
     m["name"] = *namePtr
     m["pluginDir"] = *pluginDirPtr
+    m["folders"] = *foldersToPackPtr
     return m
 }

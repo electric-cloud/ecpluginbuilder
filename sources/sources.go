@@ -7,14 +7,16 @@ import (
     "path/filepath"
     "pluginwiz/utils"
     "strings"
+    "html"
+    "io/ioutil"
 )
 
 func CreateBuildTree(
     pluginDirectory string,
     subfolders []string,
-    placeholders map[string]string) (err error) {
+    placeholders map[string]string) (buildDirectory string, err error) {
 
-    buildDirectory, err := createBuildDirectory(pluginDirectory)
+    buildDirectory, err = createBuildDirectory(pluginDirectory)
     if err != nil {
         panic(err)
     }
@@ -47,9 +49,33 @@ func CreateBuildTree(
         })
     }
 
-    fmt.Print("")
+    err = BuildProjectXML(pluginDirectory, buildDirectory)
 
     return
+}
+
+
+func BuildProjectXML(pluginDir, pluginBuild string) (err error) {
+    filename := path.Join(pluginBuild, "META-INF", "project.xml")
+    // This one will be processed separately
+    ecPerlFilename := path.Join(pluginDir, "ec_setup.pl")
+    ecPerl, err := os.Open(ecPerlFilename)
+    if err != nil {
+        return
+    }
+    defer ecPerl.Close()
+    b, err := ioutil.ReadAll(ecPerl)
+    if err != nil {
+        return
+    }
+    escapedCode := html.EscapeString(string(b))
+    fmt.Println(escapedCode)
+
+    err = ioutil.WriteFile(filename, []byte(escapedCode), os.ModePerm)
+    if err != nil {
+        return
+    }
+    return nil
 }
 
 func needToProcessPlaceholders(folder string) bool {

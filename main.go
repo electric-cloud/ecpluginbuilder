@@ -2,39 +2,20 @@ package main
 
 import (
     "fmt"
-    // "os"
-    // "io"
-    // "path/filepath"
-    // "path"
     "pluginwiz/sources"
-    "pluginwiz/ioutil"
-    "strings"
     "pluginwiz/params"
+    "pluginwiz/packer"
 )
 
 
-func updateVersion( oldVersion string ) string {
-    parts := strings.Split(oldVersion, ".")
-    if len(parts) == 3 {
-        parts = append(parts, "99")
-    } else if len(parts) == 4 {
-        parts[3] = "100"
-    }
-    return strings.Join(parts, ".")
-}
-
 func main() {
-    p := ioutil.GetParameters()
-    fmt.Printf("%+v\n", p)
-    folders := []string{"t"}
-    _ = folders
-
     // Read all the possible sources of input
     args := params.GetCommandLineArguments()
     pluginDir, err := params.GetPluginDirectory(args)
     pluginXml, err := params.ReadPluginXML(pluginDir)
     if err != nil {
-        panic(err)
+        fmt.Println(err)
+        return
     }
 
     version, err := params.GetPluginVersion(args, pluginXml)
@@ -54,5 +35,16 @@ func main() {
     placeholders["%PLUGIN_VERSION%"] = version
     placeholders["%PLUGIN_NAME%"] = name + "-" + version
 
-    sources.CreateBuildTree(pluginDir, folders, placeholders)
+    folders := params.GetFoldersToPack(args)
+    fmt.Println(folders)
+
+    buildDirectory, err := sources.CreateBuildTree(pluginDir, folders, placeholders)
+    if err != nil {
+        fmt.Println(err)
+        return
+    }
+    fmt.Println(buildDirectory)
+
+    archiveFilename, err := packer.PackZip(folders, buildDirectory, name, version)
+    fmt.Println(archiveFilename)
 }
