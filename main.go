@@ -33,12 +33,14 @@ func main() {
     placeholders := make(map[string]string)
     placeholders["%PLUGIN_KEY%"] = name
     placeholders["%PLUGIN_VERSION%"] = version
-    placeholders["%PLUGIN_NAME%"] = name + "-" + version
+
+    projectName := name + "-" + version
+    placeholders["%PLUGIN_NAME%"] = projectName
 
     folders := params.GetFoldersToPack(args)
     fmt.Println(folders)
 
-    buildDirectory, err := sources.CreateBuildTree(pluginDir, folders, placeholders)
+    buildDirectory, err := sources.CreateBuildTree(pluginDir, folders, projectName, placeholders)
     if err != nil {
         fmt.Println(err)
         return

@@ -9,11 +9,13 @@ import (
     "strings"
     "html"
     "io/ioutil"
+    "encoding/xml"
 )
 
 func CreateBuildTree(
     pluginDirectory string,
     subfolders []string,
+    projectName string,
     placeholders map[string]string) (buildDirectory string, err error) {
 
     buildDirectory, err = createBuildDirectory(pluginDirectory)
@@ -49,13 +51,13 @@ func CreateBuildTree(
         })
     }
 
-    err = BuildProjectXML(pluginDirectory, buildDirectory)
+    err = BuildProjectXML(pluginDirectory, buildDirectory, projectName)
 
     return
 }
 
 
-func BuildProjectXML(pluginDir, pluginBuild string) (err error) {
+func BuildProjectXML(pluginDir, pluginBuild, projectName string) (err error) {
     filename := path.Join(pluginBuild, "META-INF", "project.xml")
     // This one will be processed separately
     ecPerlFilename := path.Join(pluginDir, "ec_setup.pl")
@@ -69,13 +71,51 @@ func BuildProjectXML(pluginDir, pluginBuild string) (err error) {
         return
     }
     escapedCode := html.EscapeString(string(b))
-    fmt.Println(escapedCode)
 
-    err = ioutil.WriteFile(filename, []byte(escapedCode), os.ModePerm)
+    exportedData := &ExportedData{
+        XMLName: xml.Name{Local: "exportedData"},
+        BuildLabel: "label",
+        ExportPath: "/projects/" + projectName,
+        Project: Project{
+            ProjectName: projectName,
+            PropertySheet: PropertySheet{[]Property{
+                Property{Value: escapedCode, PropertyName: "ec_setup", Expandable: 0},
+            }},
+        },
+    }
+
+    out, err := xml.MarshalIndent(exportedData, "", "  ")
+    if err != nil {
+        return
+    }
+
+    err = ioutil.WriteFile(filename, out, os.ModePerm)
     if err != nil {
         return
     }
     return nil
+}
+
+type ExportedData struct {
+    XMLName xml.Name
+    BuildLabel string `xml:"buildLabel,attr"`
+    ExportPath string `xml:"exportPath"`
+    Project Project `xml:"project"`
+}
+
+type Project struct {
+    ProjectName string `xml:"projectName"`
+    PropertySheet PropertySheet `xml:"propertySheet"`
+}
+
+type PropertySheet struct {
+    Property []Property `xml:"property"`
+}
+
+type Property struct {
+    Expandable int `xml:"expandable"`
+    PropertyName string `xml:"propertyName"`
+    Value string `xml:"value"`
 }
 
 func needToProcessPlaceholders(folder string) bool {
