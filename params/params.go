@@ -110,6 +110,7 @@ func ReadPluginXML(pluginDirectory string) (p PluginXML, err error) {
 func GetFoldersToPack(args CommandLineArguments) []string {
     if args["folders"] != "" {
         folders := strings.Split(args["folders"],",")
+        // TODO add META-INF folder if it does not in list
         return folders
     } else {
         return []string{"lib", "dsl", "t", "htdocs", "pages", "META-INF"}

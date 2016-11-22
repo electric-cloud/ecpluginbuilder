@@ -8,11 +8,12 @@ import (
 )
 
 
-func main() {
+func Build() {
     // Read all the possible sources of input
     args := params.GetCommandLineArguments()
     pluginDir, err := params.GetPluginDirectory(args)
     pluginXml, err := params.ReadPluginXML(pluginDir)
+
     if err != nil {
         fmt.Println(err)
         return
@@ -49,4 +50,8 @@ func main() {
 
     archiveFilename, err := packer.PackZip(folders, buildDirectory, name, version)
     fmt.Println(archiveFilename)
+}
+
+func main() {
+    Build()
 }

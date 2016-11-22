@@ -1,7 +1,6 @@
 package sources
 
 import (
-    "fmt"
     "os"
     "path"
     "path/filepath"
