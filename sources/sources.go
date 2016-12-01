@@ -9,7 +9,10 @@ import (
     "html"
     "io/ioutil"
     "encoding/xml"
+    "regexp"
 )
+
+
 
 func CreateBuildTree(
     pluginDirectory string,
@@ -52,6 +55,23 @@ func CreateBuildTree(
 
     err = BuildProjectXML(pluginDirectory, buildDirectory, projectName)
 
+    return
+}
+
+
+func UpdatePluginXML(pluginDir, pluginBuild, version string) (err error) {
+    pluginXmlPath := path.Join(pluginDir, "META-INF", "plugin.xml")
+    pluginXML, err := ioutil.ReadFile(pluginXmlPath)
+    if err != nil {
+        return
+    }
+    // Not very flexible, but simple and fast way to do things
+    // TODO make is nice
+    re := regexp.MustCompile("<version>.+?</version>")
+    updated := re.ReplaceAllString(string(pluginXML), "<version>" + version + "</version>")
+
+    destination := path.Join(pluginBuild, "META-INF", "plugin.xml")
+    err = ioutil.WriteFile(destination, []byte(updated), os.ModePerm)
     return
 }
 

@@ -47,9 +47,11 @@ func Build() {
         return
     }
     fmt.Println(buildDirectory)
+    err = sources.UpdatePluginXML(pluginDir, buildDirectory, version)
 
     archiveFilename, err := packer.PackZip(folders, buildDirectory, name, version)
-    fmt.Println(archiveFilename)
+    fmt.Println("Build archive: " + archiveFilename)
+    fmt.Println("Success!")
 }
 
 func main() {
