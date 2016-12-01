@@ -32,11 +32,11 @@ func Build() {
 
     fmt.Println("Plugin name is " + name)
     placeholders := make(map[string]string)
-    placeholders["%PLUGIN_KEY%"] = name
-    placeholders["%PLUGIN_VERSION%"] = version
+    placeholders["@PLUGIN_KEY@"] = name
+    placeholders["@PLUGIN_VERSION@"] = version
 
     projectName := name + "-" + version
-    placeholders["%PLUGIN_NAME%"] = projectName
+    placeholders["@PLUGIN_NAME@"] = projectName
 
     folders := params.GetFoldersToPack(args)
     fmt.Println(folders)
@@ -49,8 +49,10 @@ func Build() {
     fmt.Println(buildDirectory)
     err = sources.UpdatePluginXML(pluginDir, buildDirectory, version)
 
-    archiveFilename, err := packer.PackZip(folders, buildDirectory, name, version)
-    fmt.Println("Build archive: " + archiveFilename)
+    archiveFilenameVersioned, err := packer.PackZipVersioned(folders, buildDirectory, name, version)
+    fmt.Println("Build archive: " + archiveFilenameVersioned)
+    archiveFilenameUnversioned, err := packer.PackZipUnversioned(folders, buildDirectory, name)
+    fmt.Println("Build archive: " + archiveFilenameUnversioned)
     fmt.Println("Success!")
 }
 

@@ -12,20 +12,31 @@ import (
 )
 
 
-func PackZip( folders []string, buildDir, name, version string) (string, error) {
+func PackZipVersioned( folders []string, buildDir, name, version string) (string, error) {
     var target string
     fmt.Println()
     archiveFilename := name + "-" + version + ".zip"
     target = path.Join(buildDir, archiveFilename)
+    err := pack(folders, buildDir, target)
+    return target, err
+}
+
+func pack(folders []string, buildDir, target string) (err error) {
     var fullPathFolders []string
     for _, folder := range folders {
         fullPathFolders = append(fullPathFolders, path.Join(buildDir, folder))
     }
-    err := Zip(target, fullPathFolders)
+    err = Zip(target, fullPathFolders)
     if err != nil {
-        return target, err
+        return
     }
-    return target, nil
+    return
+}
+
+func PackZipUnversioned(folders []string, buildDir, name string) (string, error) {
+    target := path.Join(buildDir, name + ".zip")
+    err := pack(folders, buildDir, target)
+    return target, err
 }
 
 // Taken from http://blog.ralch.com/tutorial/golang-working-with-zip/
