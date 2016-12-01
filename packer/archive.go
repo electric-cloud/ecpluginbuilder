@@ -8,13 +8,11 @@ import (
     "path"
     "strings"
     "io"
-    "fmt"
 )
 
 
 func PackZipVersioned( folders []string, buildDir, name, version string) (string, error) {
     var target string
-    fmt.Println()
     archiveFilename := name + "-" + version + ".zip"
     target = path.Join(buildDir, archiveFilename)
     err := pack(folders, buildDir, target)
@@ -51,7 +49,6 @@ func Zip(target string, sources []string) error {
     defer archive.Close()
 
     for _, source := range sources {
-
         info, err := os.Stat(source)
         if err != nil {
             return nil

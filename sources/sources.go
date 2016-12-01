@@ -9,7 +9,6 @@ import (
     "io/ioutil"
     "encoding/xml"
     "regexp"
-    "fmt"
 )
 
 
@@ -95,8 +94,6 @@ func BuildProjectXML(pluginDir, pluginBuild, projectName string, placeholders ma
     for placeholder, value := range placeholders {
         escapedCode = strings.Replace(escapedCode, placeholder, value, -1)
     }
-
-    fmt.Println(escapedCode)
 
     exportedData := &ExportedData{
         XMLName: xml.Name{Local: "exportedData"},
