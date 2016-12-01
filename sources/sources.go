@@ -6,10 +6,10 @@ import (
     "path/filepath"
     "pluginwiz/utils"
     "strings"
-    "html"
     "io/ioutil"
     "encoding/xml"
     "regexp"
+    "fmt"
 )
 
 
@@ -53,7 +53,7 @@ func CreateBuildTree(
         })
     }
 
-    err = BuildProjectXML(pluginDirectory, buildDirectory, projectName)
+    err = BuildProjectXML(pluginDirectory, buildDirectory, projectName, placeholders)
 
     return
 }
@@ -76,7 +76,7 @@ func UpdatePluginXML(pluginDir, pluginBuild, version string) (err error) {
 }
 
 
-func BuildProjectXML(pluginDir, pluginBuild, projectName string) (err error) {
+func BuildProjectXML(pluginDir, pluginBuild, projectName string, placeholders map[string]string) (err error) {
     filename := path.Join(pluginBuild, "META-INF", "project.xml")
     // This one will be processed separately
     ecPerlFilename := path.Join(pluginDir, "ec_setup.pl")
@@ -89,11 +89,20 @@ func BuildProjectXML(pluginDir, pluginBuild, projectName string) (err error) {
     if err != nil {
         return
     }
-    escapedCode := html.EscapeString(string(b))
+    escapedCode := string(b)
+    // TODO make a separate function
+
+    for placeholder, value := range placeholders {
+        escapedCode = strings.Replace(escapedCode, placeholder, value, -1)
+    }
+
+    fmt.Println(escapedCode)
 
     exportedData := &ExportedData{
         XMLName: xml.Name{Local: "exportedData"},
-        BuildLabel: "label",
+        BuildLabel: "build_3.5_30434_OPT_2010.01.13_07:32:22",
+        Version: "39",
+        BuildVersion: "3.5.1.30434",
         ExportPath: "/projects/" + projectName,
         Project: Project{
             ProjectName: projectName,
@@ -118,6 +127,8 @@ func BuildProjectXML(pluginDir, pluginBuild, projectName string) (err error) {
 type ExportedData struct {
     XMLName xml.Name
     BuildLabel string `xml:"buildLabel,attr"`
+    BuildVersion string `xml:"buildVersion,attr"`
+    Version string `xml:"version,attr"`
     ExportPath string `xml:"exportPath"`
     Project Project `xml:"project"`
 }
