@@ -75,7 +75,7 @@ func GetPluginVersion(args map[string]string, pluginXML PluginXML) (buildNumber 
     if buildNumber == "" {
         buildNumber = getBuildNumberFromVersion(pluginVersion)
     }
-    fmt.Println(args)
+
     if args["incrementBuildNumber"] != "" {
         var numericBuild int
         if buildNumber == "" {

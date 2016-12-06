@@ -15,8 +15,7 @@ func Build() {
     pluginXml, err := params.ReadPluginXML(pluginDir)
 
     if err != nil {
-        fmt.Println(err)
-        return
+        panic(err)
     }
 
     version, err := params.GetPluginVersion(args, pluginXml)
@@ -39,14 +38,14 @@ func Build() {
     placeholders["@PLUGIN_NAME@"] = projectName
 
     folders := params.GetFoldersToPack(args)
-    fmt.Println(folders)
+    fmt.Printf("Folders to pack: %v", folders)
 
     buildDirectory, err := sources.CreateBuildTree(pluginDir, folders, projectName, placeholders)
     if err != nil {
         fmt.Println(err)
         return
     }
-    fmt.Println(buildDirectory)
+    fmt.Println("Build directory is " + buildDirectory)
     err = sources.UpdatePluginXML(pluginDir, buildDirectory, version)
 
     archiveFilenameVersioned, err := packer.PackZipVersioned(folders, buildDirectory, name, version)
