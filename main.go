@@ -37,7 +37,10 @@ func Build() {
     projectName := name + "-" + version
     placeholders["@PLUGIN_NAME@"] = projectName
 
-    folders := params.GetFoldersToPack(args)
+    folders, err := params.GetFoldersToPack(args)
+    if err != nil {
+        panic(err)
+    }
     fmt.Printf("Folders to pack: %v", folders)
 
     buildDirectory, err := sources.CreateBuildTree(pluginDir, folders, projectName, placeholders)
