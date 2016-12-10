@@ -43,7 +43,7 @@ func Build() {
     }
     fmt.Printf("Folders to pack: %v", folders)
 
-    buildDirectory, err := sources.CreateBuildTree(pluginDir, folders, projectName, placeholders)
+    buildDirectory, err := sources.CreateBuildTree(pluginDir, folders, projectName, placeholders, args)
     if err != nil {
         fmt.Println(err)
         return

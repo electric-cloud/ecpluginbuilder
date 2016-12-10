@@ -5,6 +5,7 @@ import (
     "path"
     "path/filepath"
     "pluginwiz/utils"
+    "pluginwiz/params"
     "strings"
     "io/ioutil"
     "encoding/xml"
@@ -12,14 +13,13 @@ import (
 )
 
 
-
 func CreateBuildTree(
     pluginDirectory string,
     subfolders []string,
     projectName string,
-    placeholders map[string]string) (buildDirectory string, err error) {
+    placeholders map[string]string, args params.CommandLineArguments) (buildDirectory string, err error) {
 
-    buildDirectory, err = createBuildDirectory(pluginDirectory)
+    buildDirectory, err = createBuildDirectory(pluginDirectory, args.PreserveBuild)
     if err != nil {
         panic(err)
     }
@@ -154,10 +154,23 @@ func needToProcessPlaceholders(folder string) bool {
     }
 }
 
-func createBuildDirectory(pluginDirectory string) (buildDirectory string, err error) {
+func createBuildDirectory(pluginDirectory string, preserveBuild bool) (buildDirectory string, err error) {
     buildDirectory = path.Join(pluginDirectory, "build")
     if _, err = os.Stat(buildDirectory); os.IsNotExist(err) {
         err = os.Mkdir(buildDirectory, os.ModePerm)
+        return
+    } else {
+        if preserveBuild {
+            return
+        }
+
+        err = os.RemoveAll(buildDirectory)
+        if err != nil {
+            return
+        }
+        err = os.Mkdir(buildDirectory, os.ModePerm)
+        return
+        // build directory must be cleaned
     }
     return
 }

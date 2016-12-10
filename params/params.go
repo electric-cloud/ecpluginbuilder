@@ -33,6 +33,7 @@ type CommandLineArguments struct {
     Folders []string
     IncrementBuildNumber bool
     AddDeveloperSuffix bool
+    PreserveBuild bool
 }
 
 type strslice []string
@@ -57,6 +58,7 @@ func GetCommandLineArguments() (args CommandLineArguments) {
     versionPtr := flag.String("plugin-version", "", "Plugin Version")
     namePtr := flag.String("plugin-name", "", "Plugin name")
     pluginDirPtr := flag.String("plugin-dir", "", "Plugin directory")
+    preserveBuildPtr := flag.Bool("preserve-build", true, "If set to false, an existing build directory will not be cleaned up")
 
     var folders strslice
     flag.Var(&folders, "folder", "List of folders to pack")
@@ -68,6 +70,7 @@ func GetCommandLineArguments() (args CommandLineArguments) {
     args.Directory = *pluginDirPtr
     args.IncrementBuildNumber = *incrementBuildNumberPtr
     args.Folders = folders
+    args.PreserveBuild = *preserveBuildPtr
 
     return
 }
