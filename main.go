@@ -2,9 +2,9 @@ package main
 
 import (
     "fmt"
-    "pluginwiz/sources"
-    "pluginwiz/params"
-    "pluginwiz/packer"
+    "github.com/electric-cloud/ecpluginbuilder/sources"
+    "github.com/electric-cloud/ecpluginbuilder/params"
+    "github.com/electric-cloud/ecpluginbuilder/packer"
 )
 
 
