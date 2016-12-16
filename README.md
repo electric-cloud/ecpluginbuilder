@@ -12,6 +12,7 @@ A simple build tool for plugins based on PluginWizard
 ### Requirements 
 - Go  
 - make or emake  
+
 ### Setup
 - Set the GOPATH environment variable to tell the Go tool where your workspace is located.
 - `go get github.com/electric-cloud/ecpluginbuilder`
