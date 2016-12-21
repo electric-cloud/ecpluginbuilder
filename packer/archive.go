@@ -3,7 +3,6 @@ package packer
 import (
     "os"
     "archive/zip"
-    // "archive"
     "path/filepath"
     "path"
     "strings"

@@ -60,9 +60,7 @@ func Build() {
         archiveFilenameUnversioned, err = packer.PackZipUnversioned(folders, buildDirectory, name)
     }
 
-    // archiveFilenameVersioned, err := packer.PackZipVersioned(folders, buildDirectory, name, version)
     fmt.Println("Build archive: " + archiveFilenameVersioned)
-    // archiveFilenameUnversioned, err := packer.PackZipUnversioned(folders, buildDirectory, name)
     fmt.Println("Build archive: " + archiveFilenameUnversioned)
     fmt.Println("Success!")
 }
