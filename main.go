@@ -51,9 +51,16 @@ func Build() {
     fmt.Println("Build directory is " + buildDirectory)
     err = sources.UpdatePluginXML(pluginDir, buildDirectory, version)
 
-    archiveFilenameVersioned, err := packer.PackZipVersioned(folders, buildDirectory, name, version)
+    var archiveFilenameVersioned, archiveFilenameUnversioned string
+    if args.IsJar {
+        archiveFilenameVersioned, err = packer.PackJarVersioned(folders, buildDirectory, name, version)
+        archiveFilenameUnversioned, err = packer.PackJarUnversioned(folders, buildDirectory, name)
+    } else {
+        archiveFilenameVersioned, err = packer.PackZipVersioned(folders, buildDirectory, name, version)
+        archiveFilenameUnversioned, err = packer.PackZipUnversioned(folders, buildDirectory, name)
+    }
+
     fmt.Println("Build archive: " + archiveFilenameVersioned)
-    archiveFilenameUnversioned, err := packer.PackZipUnversioned(folders, buildDirectory, name)
     fmt.Println("Build archive: " + archiveFilenameUnversioned)
     fmt.Println("Success!")
 }

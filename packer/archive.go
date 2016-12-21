@@ -3,7 +3,6 @@ package packer
 import (
     "os"
     "archive/zip"
-    // "archive"
     "path/filepath"
     "path"
     "strings"
@@ -12,11 +11,20 @@ import (
 
 
 func PackZipVersioned( folders []string, buildDir, name, version string) (string, error) {
-    var target string
-    archiveFilename := name + "-" + version + ".zip"
-    target = path.Join(buildDir, archiveFilename)
-    err := pack(folders, buildDir, target)
-    return target, err
+    return PackArchiveVersioned(folders, buildDir, name, version, "zip")
+}
+
+
+func PackZipUnversioned(folders []string, buildDir, name string) (string, error) {
+    return PackArchiveUnversioned(folders, buildDir, name, "zip")
+}
+
+func PackJarVersioned(folders []string, buildDir, name, version string) (string, error) {
+    return PackArchiveVersioned(folders, buildDir, name, version, "jar")
+}
+
+func PackJarUnversioned(folders []string, buildDir, name string) (string, error) {
+    return PackArchiveUnversioned(folders, buildDir, name, "jar")
 }
 
 func pack(folders []string, buildDir, target string) (err error) {
@@ -31,8 +39,16 @@ func pack(folders []string, buildDir, target string) (err error) {
     return
 }
 
-func PackZipUnversioned(folders []string, buildDir, name string) (string, error) {
-    target := path.Join(buildDir, name + ".zip")
+func PackArchiveUnversioned(folders []string, buildDir, name, extension string) (string, error) {
+    target := path.Join(buildDir, name + "." + extension)
+    err := pack(folders, buildDir, target)
+    return target, err
+}
+
+func PackArchiveVersioned( folders []string, buildDir, name, version, extension string) (string, error) {
+    var target string
+    archiveFilename := name + "-" + version + "." + extension
+    target = path.Join(buildDir, archiveFilename)
     err := pack(folders, buildDir, target)
     return target, err
 }

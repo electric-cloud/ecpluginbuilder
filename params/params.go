@@ -34,6 +34,7 @@ type CommandLineArguments struct {
     IncrementBuildNumber bool
     AddDeveloperSuffix bool
     PreserveBuild bool
+    IsJar bool
 }
 
 type strslice []string
@@ -59,6 +60,7 @@ func GetCommandLineArguments() (args CommandLineArguments) {
     namePtr := flag.String("plugin-name", "", "Plugin name")
     pluginDirPtr := flag.String("plugin-dir", "", "Plugin directory")
     preserveBuildPtr := flag.Bool("preserve-build", true, "If set to false, an existing build directory will not be cleaned up")
+    isJarPtr := flag.Bool("pack-jar", false, "If set to true, the .jar will be built instead of .zip")
 
     var folders strslice
     flag.Var(&folders, "folder", "List of folders to pack")
@@ -71,6 +73,7 @@ func GetCommandLineArguments() (args CommandLineArguments) {
     args.IncrementBuildNumber = *incrementBuildNumberPtr
     args.Folders = folders
     args.PreserveBuild = *preserveBuildPtr
+    args.IsJar = *isJarPtr
 
     return
 }
