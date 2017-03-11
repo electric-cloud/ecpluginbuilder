@@ -10,8 +10,17 @@ import (
     "io/ioutil"
     "encoding/xml"
     "regexp"
+    "fmt"
 )
 
+
+
+func folderExists(path string) (bool, error) {
+    _, err := os.Stat(path)
+    if err == nil { return true, nil }
+    if os.IsNotExist(err) { return false, nil }
+    return true, err
+}
 
 func CreateBuildTree(
     pluginDirectory string,
@@ -26,6 +35,19 @@ func CreateBuildTree(
 
     for _, folder := range subfolders {
         currentDir := path.Join(pluginDirectory, folder)
+        fmt.Println("Current dir is " + currentDir)
+
+        var exists bool
+        exists, err = folderExists(currentDir)
+
+        if err != nil {
+            return
+        }
+        if !exists {
+            fmt.Println("WARNING: " + currentDir + " does not exist")
+            continue
+        }
+
         filepath.Walk(currentDir, func(p string, fi os.FileInfo, _ error ) (err error) {
             relativePath, _ := filepath.Rel(currentDir, p)
             newFilePath := path.Join(buildDirectory, folder, relativePath)
