@@ -7,6 +7,7 @@ import (
     "path"
     "strings"
     "io"
+    "github.com/electric-cloud/ecpluginbuilder/utils"
 )
 
 
@@ -27,10 +28,19 @@ func PackJarUnversioned(folders []string, buildDir, name string) (string, error)
     return PackArchiveUnversioned(folders, buildDir, name, "jar")
 }
 
+
 func pack(folders []string, buildDir, target string) (err error) {
     var fullPathFolders []string
     for _, folder := range folders {
-        fullPathFolders = append(fullPathFolders, path.Join(buildDir, folder))
+        fullPath := path.Join(buildDir, folder)
+        var exists bool
+        exists, err = utils.FolderExists(fullPath)
+        if err != nil {
+            return
+        }
+        if exists {
+            fullPathFolders = append(fullPathFolders, fullPath)
+        }
     }
     err = Zip(target, fullPathFolders)
     if err != nil {

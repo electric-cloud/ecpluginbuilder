@@ -14,14 +14,6 @@ import (
 )
 
 
-
-func folderExists(path string) (bool, error) {
-    _, err := os.Stat(path)
-    if err == nil { return true, nil }
-    if os.IsNotExist(err) { return false, nil }
-    return true, err
-}
-
 func CreateBuildTree(
     pluginDirectory string,
     subfolders []string,
@@ -35,11 +27,9 @@ func CreateBuildTree(
 
     for _, folder := range subfolders {
         currentDir := path.Join(pluginDirectory, folder)
-        fmt.Println("Current dir is " + currentDir)
-
         var exists bool
-        exists, err = folderExists(currentDir)
-
+        exists, err = utils.FolderExists(currentDir)
+        _ = exists
         if err != nil {
             return
         }
@@ -47,7 +37,7 @@ func CreateBuildTree(
             fmt.Println("WARNING: " + currentDir + " does not exist")
             continue
         }
-
+        fmt.Println("Going to folder: " + currentDir)
         filepath.Walk(currentDir, func(p string, fi os.FileInfo, _ error ) (err error) {
             relativePath, _ := filepath.Rel(currentDir, p)
             newFilePath := path.Join(buildDirectory, folder, relativePath)
@@ -72,6 +62,7 @@ func CreateBuildTree(
             }
             return
         })
+
     }
 
     err = BuildProjectXML(pluginDirectory, buildDirectory, projectName, placeholders)
