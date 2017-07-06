@@ -72,7 +72,8 @@ func CreateBuildTree(
 
 
 func UpdatePluginXML(pluginDir, pluginBuild, version string) (err error) {
-    pluginXmlPath := path.Join(pluginDir, "META-INF", "plugin.xml")
+    pluginXmlPath := path.Join(pluginBuild, "META-INF", "plugin.xml")
+    fmt.Println("Plugin XML path is " + pluginXmlPath)
     pluginXML, err := ioutil.ReadFile(pluginXmlPath)
     if err != nil {
         return
