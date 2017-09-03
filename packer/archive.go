@@ -7,7 +7,6 @@ import (
     "path"
     "strings"
     "io"
-    "fmt"
     "github.com/electric-cloud/ecpluginbuilder/utils"
 )
 
@@ -98,14 +97,10 @@ func Zip(target string, sources []string) error {
                 return err
             }
 
-            // fmt.Println("P: " + p)
-            // fmt.Println("Source: " + source)
-            // fmt.Println("TrimPrefix:" + strings.TrimPrefix(filepath.ToSlash(p), filepath.ToSlash(source)))
-
             if baseDir != "" {
+                // Windows may have a mixture of shashes (/ and \)
                 var trimmed =  strings.TrimPrefix(filepath.ToSlash(p), filepath.ToSlash(source))
                 header.Name = filepath.Join(baseDir, trimmed)
-                fmt.Println(header.Name)
             }
 
             if info.IsDir() {
