@@ -65,6 +65,8 @@ func PackArchiveVersioned( folders []string, buildDir, name, version, extension 
 
 // Taken from http://blog.ralch.com/tutorial/golang-working-with-zip/
 func Zip(target string, sources []string) error {
+    // fmt.Println(target)
+    // fmt.Println(sources)
     zipfile, err := os.Create(target)
     if err != nil {
         return err
@@ -96,7 +98,9 @@ func Zip(target string, sources []string) error {
             }
 
             if baseDir != "" {
-                header.Name = filepath.Join(baseDir, strings.TrimPrefix(p, source))
+                // Windows may have a mixture of shashes (/ and \)
+                var trimmed =  strings.TrimPrefix(filepath.ToSlash(p), filepath.ToSlash(source))
+                header.Name = filepath.Join(baseDir, trimmed)
             }
 
             if info.IsDir() {
