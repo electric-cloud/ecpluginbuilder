@@ -7,9 +7,11 @@ import (
     "github.com/electric-cloud/ecpluginbuilder/packer"
 )
 
+var version string
 
 func Build() {
     // Read all the possible sources of input
+    fmt.Println("ecpluginbuilder version is " + version)
     args := params.GetCommandLineArguments()
     pluginDir, err := params.GetPluginDirectory(args)
     pluginXml, err := params.ReadPluginXML(pluginDir)
