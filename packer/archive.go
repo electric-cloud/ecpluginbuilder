@@ -100,7 +100,9 @@ func Zip(target string, sources []string) error {
             if baseDir != "" {
                 // Windows may have a mixture of shashes (/ and \)
                 var trimmed =  strings.TrimPrefix(filepath.ToSlash(p), filepath.ToSlash(source))
-                header.Name = filepath.Join(baseDir, trimmed)
+				// Because commander needs / 
+                header.Name = strings.Replace(filepath.Join(baseDir, trimmed), "\\", "/", -1)
+				//fmt.Println(header.Name)
             }
 
             if info.IsDir() {
