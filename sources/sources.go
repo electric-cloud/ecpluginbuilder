@@ -89,6 +89,32 @@ func UpdatePluginXML(pluginDir, pluginBuild, version string) (err error) {
 }
 
 
+func InjectPromotionIntoSetup(pluginDir, ecSetup string) (injected string, err error) {
+    injected = ecSetup
+    promoteFileName := path.Join(pluginDir, "dsl", "promote.groovy")
+    promoteCode, err := readStringFromFile(promoteFileName)
+    if err != nil {
+        return
+    }
+    demoteFileName := path.Join(pluginDir, "dsl", "demote.groovy")
+    demoteCode, err := readStringFromFile(demoteFileName)
+    if err != nil {
+        return
+    }
+
+    promotePlaceholder := "# promote.groovy placeholder"
+    demotePlaceholder := "# demote.groovy placeholder"
+
+    if !strings.Contains(ecSetup, promotePlaceholder) || !strings.Contains(ecSetup, demotePlaceholder) {
+        fmt.Println("WARNING: ec_setup.pl does not contain placeholders for promote.groovy and demote.groovy. See PLUGINWIZ-8 for details.")
+        return
+    }
+    injected = strings.Replace(ecSetup, promotePlaceholder, promoteCode, -1)
+    injected = strings.Replace(injected, demotePlaceholder, demoteCode, -1)
+    return
+}
+
+
 func BuildProjectXML(pluginDir, pluginBuild, projectName string, placeholders map[string]string) (err error) {
     filename := path.Join(pluginBuild, "META-INF", "project.xml")
     // This one will be processed separately
@@ -103,7 +129,11 @@ func BuildProjectXML(pluginDir, pluginBuild, projectName string, placeholders ma
         return
     }
     escapedCode := string(b)
-    // TODO make a separate function
+    escapedCode, err = InjectPromotionIntoSetup(pluginDir, escapedCode)
+
+    if err != nil {
+        return
+    }
 
     for placeholder, value := range placeholders {
         escapedCode = strings.Replace(escapedCode, placeholder, value, -1)
@@ -186,5 +216,20 @@ func createBuildDirectory(pluginDirectory string, preserveBuild bool) (buildDire
         return
         // build directory must be cleaned
     }
+    return
+}
+
+
+func readStringFromFile(filename string) (content string, err error) {
+    handler, err := os.Open(filename)
+    if err != nil {
+        return
+    }
+    defer handler.Close()
+    b, err := ioutil.ReadAll(handler)
+    if err != nil {
+        return
+    }
+    content = string(b)
     return
 }
