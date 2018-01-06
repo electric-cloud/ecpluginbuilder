@@ -6,11 +6,13 @@ import (
     "path/filepath"
     "github.com/electric-cloud/ecpluginbuilder/utils"
     "github.com/electric-cloud/ecpluginbuilder/params"
+    "github.com/electric-cloud/ecpluginbuilder/packer"
     "strings"
     "io/ioutil"
     "encoding/xml"
     "regexp"
     "fmt"
+    "encoding/base64"
 )
 
 
@@ -114,6 +116,29 @@ func InjectPromotionIntoSetup(pluginDir, ecSetup string) (injected string, err e
     return
 }
 
+func packDependencies(pluginDir, pluginBuild string) (base64Depedencies string, err error) {
+    libsFolder := path.Join(pluginDir, "lib")
+    exists, err := utils.FolderExists(libsFolder)
+    if err != nil {
+        return
+    }
+
+    if !exists {
+        fmt.Println("/lib folder does not exist")
+        base64Depedencies = ""
+        return
+    }
+
+    packedFolder, err := packer.PackDependencies("lib", pluginDir, pluginBuild)
+    fmt.Println("Packed dependencies: " + packedFolder)
+    binaryContent, err := ioutil.ReadFile(packedFolder)
+    if err != nil {
+        return
+    }
+    base64Depedencies = base64.StdEncoding.EncodeToString(binaryContent)
+    return
+}
+
 
 func BuildProjectXML(pluginDir, pluginBuild, projectName string, placeholders map[string]string) (err error) {
     filename := path.Join(pluginBuild, "META-INF", "project.xml")
@@ -139,6 +164,11 @@ func BuildProjectXML(pluginDir, pluginBuild, projectName string, placeholders ma
         escapedCode = strings.Replace(escapedCode, placeholder, value, -1)
     }
 
+    dependencies, err := packDependencies(pluginDir, pluginBuild)
+    if err != nil {
+        return
+    }
+
     exportedData := &ExportedData{
         XMLName: xml.Name{Local: "exportedData"},
         BuildLabel: "build_3.5_30434_OPT_2010.01.13_07:32:22",
@@ -149,6 +179,7 @@ func BuildProjectXML(pluginDir, pluginBuild, projectName string, placeholders ma
             ProjectName: projectName,
             PropertySheet: PropertySheet{[]Property{
                 Property{Value: escapedCode, PropertyName: "ec_setup", Expandable: 0},
+                Property{Value: dependencies, PropertyName: "ec_groovyDependencies", Expandable: 0},
             }},
         },
     }

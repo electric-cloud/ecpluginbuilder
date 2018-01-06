@@ -2,6 +2,7 @@ package packer
 
 import (
     "os"
+    "time"
     "archive/zip"
     "path/filepath"
     "path"
@@ -15,7 +16,6 @@ func PackZipVersioned( folders []string, buildDir, name, version string) (string
     return PackArchiveVersioned(folders, buildDir, name, version, "zip")
 }
 
-
 func PackZipUnversioned(folders []string, buildDir, name string) (string, error) {
     return PackArchiveUnversioned(folders, buildDir, name, "zip")
 }
@@ -27,7 +27,6 @@ func PackJarVersioned(folders []string, buildDir, name, version string) (string,
 func PackJarUnversioned(folders []string, buildDir, name string) (string, error) {
     return PackArchiveUnversioned(folders, buildDir, name, "jar")
 }
-
 
 func pack(folders []string, buildDir, target string) (err error) {
     var fullPathFolders []string
@@ -61,6 +60,15 @@ func PackArchiveVersioned( folders []string, buildDir, name, version, extension 
     target = path.Join(buildDir, archiveFilename)
     err := pack(folders, buildDir, target)
     return target, err
+}
+
+func PackDependencies(folderName, pluginDir, buildDir string) (archiveName string, err error) {
+    now := time.Now()
+    archiveName = path.Join(buildDir, folderName + "-" + now.Format("20060102150405") + ".zip")
+    folders := make([]string, 1)
+    folders[0] = folderName
+    err = pack(folders, buildDir, archiveName)
+    return
 }
 
 // Taken from http://blog.ralch.com/tutorial/golang-working-with-zip/
@@ -100,7 +108,7 @@ func Zip(target string, sources []string) error {
             if baseDir != "" {
                 // Windows may have a mixture of shashes (/ and \)
                 var trimmed =  strings.TrimPrefix(filepath.ToSlash(p), filepath.ToSlash(source))
-				// Because commander needs / 
+				// Because commander needs /
                 header.Name = strings.Replace(filepath.Join(baseDir, trimmed), "\\", "/", -1)
 				//fmt.Println(header.Name)
             }
