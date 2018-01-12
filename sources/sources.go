@@ -13,6 +13,9 @@ import (
     "regexp"
     "fmt"
     "encoding/base64"
+    "strconv"
+    "crypto/md5"
+    "encoding/hex"
 )
 
 
@@ -67,7 +70,7 @@ func CreateBuildTree(
 
     }
 
-    err = BuildProjectXML(pluginDirectory, buildDirectory, projectName, placeholders)
+    err = BuildProjectXML(pluginDirectory, buildDirectory, projectName, placeholders, args)
 
     return
 }
@@ -135,12 +138,16 @@ func packDependencies(pluginDir, pluginBuild string) (base64Depedencies string, 
     if err != nil {
         return
     }
+    err = os.Remove(packedFolder)
+    if err != nil {
+        return
+    }
     base64Depedencies = base64.StdEncoding.EncodeToString(binaryContent)
     return
 }
 
 
-func BuildProjectXML(pluginDir, pluginBuild, projectName string, placeholders map[string]string) (err error) {
+func BuildProjectXML(pluginDir, pluginBuild, projectName string, placeholders map[string]string, args params.CommandLineArguments) (err error) {
     filename := path.Join(pluginBuild, "META-INF", "project.xml")
     // This one will be processed separately
     ecPerlFilename := path.Join(pluginDir, "ec_setup.pl")
@@ -169,6 +176,31 @@ func BuildProjectXML(pluginDir, pluginBuild, projectName string, placeholders ma
         return
     }
 
+    chunkSize := args.DependencyChunkSize
+    fmt.Printf("Dependency chunk size is %d\n", chunkSize)
+    checksum := getMD5Hash(dependencies)
+    chunkedDependencies := chunkString(chunkSize, dependencies)
+    var deps string
+    for _, chunk := range chunkedDependencies {
+        deps += chunk
+    }
+    chunkedDependenciesStruct := &PropertySheet{[]Property{}}
+
+    for index, chunk := range chunkedDependencies {
+        property := Property{
+            Value: chunk,
+            PropertyName: "ec_dependencyChunk_" + strconv.Itoa(index),
+        }
+        chunkedDependenciesStruct.Property = append(chunkedDependenciesStruct.Property, property)
+    }
+    chunkedDependenciesStruct.Property = append(chunkedDependenciesStruct.Property, Property{
+        Value: checksum,
+        PropertyName: "checksum",
+        Description: "MD5 checksum of ZIP archive",
+    })
+
+    fmt.Println("Checksum is " + checksum)
+
     exportedData := &ExportedData{
         XMLName: xml.Name{Local: "exportedData"},
         BuildLabel: "build_3.5_30434_OPT_2010.01.13_07:32:22",
@@ -179,7 +211,7 @@ func BuildProjectXML(pluginDir, pluginBuild, projectName string, placeholders ma
             ProjectName: projectName,
             PropertySheet: PropertySheet{[]Property{
                 Property{Value: escapedCode, PropertyName: "ec_setup", Expandable: 0},
-                Property{Value: dependencies, PropertyName: "ec_groovyDependencies", Expandable: 0},
+                Property{PropertySheet: chunkedDependenciesStruct, PropertyName: "ec_groovyDependencies", Description: "Packed .jar dependencies"},
             }},
         },
     }
@@ -218,6 +250,8 @@ type Property struct {
     Expandable int `xml:"expandable"`
     PropertyName string `xml:"propertyName"`
     Value string `xml:"value"`
+    Description string `xml:"description"`
+    PropertySheet *PropertySheet `xml:"propertySheet,omitempty"`
 }
 
 func needToProcessPlaceholders(folder string) bool {
@@ -262,5 +296,25 @@ func readStringFromFile(filename string) (content string, err error) {
         return
     }
     content = string(b)
+    return
+}
+
+
+func chunkString(chunkSize int, s string) (result []string) {
+    result = make([]string, 0)
+    runes := []rune(s)
+    var chunk []rune
+    for len(runes) > chunkSize {
+        chunk, runes = runes[0:chunkSize], runes[chunkSize:]
+        result = append(result, string(chunk))
+    }
+    result = append(result, string(runes))
+    return
+}
+
+func getMD5Hash(s string) (result string) {
+    hasher := md5.New()
+    hasher.Write([]byte(s))
+    result = hex.EncodeToString(hasher.Sum(nil))
     return
 }
