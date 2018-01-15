@@ -35,6 +35,7 @@ type CommandLineArguments struct {
     AddDeveloperSuffix bool
     PreserveBuild bool
     IsJar bool
+    DependencyChunkSize int
 }
 
 type strslice []string
@@ -61,6 +62,7 @@ func GetCommandLineArguments() (args CommandLineArguments) {
     pluginDirPtr := flag.String("plugin-dir", "", "Plugin directory")
     preserveBuildPtr := flag.Bool("preserve-build", true, "If set to false, an existing build directory will not be cleaned up")
     isJarPtr := flag.Bool("pack-jar", false, "If set to true, the .jar will be built instead of .zip")
+    depChunkSizePtr := flag.Int("dependency-chunk-size", 10 * 1024 * 1024, "Dependencies chuunk size (default it 10 MB)")
 
     var folders strslice
     flag.Var(&folders, "folder", "List of folders to pack")
@@ -74,6 +76,7 @@ func GetCommandLineArguments() (args CommandLineArguments) {
     args.Folders = folders
     args.PreserveBuild = *preserveBuildPtr
     args.IsJar = *isJarPtr
+    args.DependencyChunkSize = *depChunkSizePtr
 
     return
 }
@@ -196,7 +199,7 @@ func GetFoldersToPack(args CommandLineArguments) (folders []string, err error) {
         return
     }
     for _, f := range files {
-        if f.IsDir() && !strings.HasPrefix(f.Name(), ".") && f.Name() != "build" {
+        if f.IsDir() && !strings.HasPrefix(f.Name(), ".") && f.Name() != "build" && f.Name() != "lib" {
             folders = append(folders, f.Name())
         }
     }
