@@ -199,7 +199,7 @@ func GetFoldersToPack(args CommandLineArguments) (folders []string, err error) {
         return
     }
     for _, f := range files {
-        if f.IsDir() && !strings.HasPrefix(f.Name(), ".") && f.Name() != "build" {
+        if f.IsDir() && !strings.HasPrefix(f.Name(), ".") && f.Name() != "build" && f.Name() != "lib" {
             folders = append(folders, f.Name())
         }
     }

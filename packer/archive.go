@@ -31,7 +31,12 @@ func PackJarUnversioned(folders []string, buildDir, name string) (string, error)
 func pack(folders []string, buildDir, target string) (err error) {
     var fullPathFolders []string
     for _, folder := range folders {
-        fullPath := path.Join(buildDir, folder)
+        var fullPath string
+        if path.IsAbs(folder) {
+            fullPath = folder
+        } else {
+            fullPath = path.Join(buildDir, folder)
+        }
         var exists bool
         exists, err = utils.FolderExists(fullPath)
         if err != nil {
@@ -66,7 +71,7 @@ func PackDependencies(folderName, pluginDir, buildDir string) (archiveName strin
     now := time.Now()
     archiveName = path.Join(buildDir, folderName + "-" + now.Format("20060102150405") + ".zip")
     folders := make([]string, 1)
-    folders[0] = folderName
+    folders[0] = path.Join(pluginDir, folderName)
     err = pack(folders, buildDir, archiveName)
     return
 }
