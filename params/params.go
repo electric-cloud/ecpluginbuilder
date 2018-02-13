@@ -62,7 +62,7 @@ func GetCommandLineArguments() (args CommandLineArguments) {
     pluginDirPtr := flag.String("plugin-dir", "", "Plugin directory")
     preserveBuildPtr := flag.Bool("preserve-build", true, "If set to false, an existing build directory will not be cleaned up")
     isJarPtr := flag.Bool("pack-jar", false, "If set to true, the .jar will be built instead of .zip")
-    depChunkSizePtr := flag.Int("dependency-chunk-size", 10 * 1024 * 1024, "Dependencies chuunk size (default it 10 MB)")
+    depChunkSizePtr := flag.Int("dependency-chunk-size", 1024 * 1024, "Dependencies chunk size in bytes (default it 1 MB)")
 
     var folders strslice
     flag.Var(&folders, "folder", "List of folders to pack")
