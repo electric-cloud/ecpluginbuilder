@@ -71,13 +71,9 @@ func PackArchiveVersioned( folders []string, buildDir, name, version, extension 
 
 func PackDependencies(folderName, pluginDir, buildDir string) (archiveName string, err error) {
     now := time.Now()
-	
     archiveName = path.Join(buildDir, folderName + "-" + now.Format("20060102150405") + ".zip")
-	archiveName = strings.Replace(archiveName, "\\", "/", -1)
     folders := make([]string, 1)
-
     folders[0] = path.Join(pluginDir, folderName)
-
     err = pack(folders, buildDir, archiveName)
     return
 }
