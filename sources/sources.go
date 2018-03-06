@@ -133,7 +133,12 @@ func packDependencies(pluginDir, pluginBuild string) (base64Depedencies string, 
     }
 
     packedFolder, err := packer.PackDependencies("lib", pluginDir, pluginBuild)
+	if err != nil {
+		return
+	}
+	
     fmt.Println("Packed dependencies: " + packedFolder)
+	
     binaryContent, err := ioutil.ReadFile(packedFolder)
     if err != nil {
         return

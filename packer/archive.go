@@ -32,7 +32,7 @@ func pack(folders []string, buildDir, target string) (err error) {
     var fullPathFolders []string
     for _, folder := range folders {
         var fullPath string
-        if path.IsAbs(folder) {
+        if filepath.IsAbs(folder) {
             fullPath = folder
         } else {
             fullPath = path.Join(buildDir, folder)
@@ -52,6 +52,8 @@ func pack(folders []string, buildDir, target string) (err error) {
     }
     return
 }
+
+
 
 func PackArchiveUnversioned(folders []string, buildDir, name, extension string) (string, error) {
     target := path.Join(buildDir, name + "." + extension)
