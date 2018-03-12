@@ -3,7 +3,7 @@ ecpluginbuilder
 A simple build tool for plugins based on PluginWizard
 
 ## Install
-- Download ecpluginbuilder for your platform from [here](bin/)
+- Download ecpluginbuilder for your platform from the releases.
 
 ## Usage
 - ecpluginbuilder -plugin-version 1.0.0.2 -folders t,META-INF,lib,dsl,pages,htdocs -plugin-dir <path-to-plugin>
