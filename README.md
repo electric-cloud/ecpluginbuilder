@@ -7,8 +7,12 @@ A simple build tool for plugins based on PluginWizard
 
 ## Usage
 
-    cd <plugin folder>
     ecpluginbuilder -plugin-version 1.0.0.2 -folder t,META-INF,lib,dsl,pages,htdocs -plugin-dir <path-to-plugin>
+
+    or
+
+    cd <plugin folder>
+    ecpluginbuilder
 
 The utility will read plugin name and version from plugin.xml, if not provided.
 
