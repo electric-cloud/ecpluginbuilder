@@ -3,7 +3,8 @@ ecpluginbuilder
 A simple build tool for plugins based on PluginWizard
 
 ## Install
-- Download ecpluginbuilder for your platform from the releases.
+
+- Download ecpluginbuilder for your platform from the releases. For 32-bit platform please use version i686.
 
 ## Usage
 
