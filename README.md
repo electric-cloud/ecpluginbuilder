@@ -35,7 +35,7 @@ The utility will read plugin name and version from plugin.xml, if not provided.
 * plugin-name: the name of the plugin. If not provided, will be taken from META-INF/plugin.xml.
 * plugin-version: the version of the plugin. If not provided, will be taken from META-INF/plugin.xml.
 * preserve-build: if set to false, the existing build directory will not be cleaned up.
-
+* pack-lib: if set to true, lib/ folder will be packed into the archive as is (and not into project.xml properties).
 
 ## Development
 ### Requirements
