@@ -4,7 +4,11 @@ A simple build tool for plugins based on PluginWizard
 
 ## Install
 
-- Download ecpluginbuilder executable for your platform from the releases. For 32-bit platform please use version i686.
+- Find an asset corresponding to your platform:
+![](assets.png). For 32-bit platforms please use version i686.
+- Download the asset and rename it to ecpluginbuilder or ecpluginbuilder.exe for Windows.
+- Optionaly add path to the ecpluginbuilder folder into PATH environment variable.
+
 
 ## Usage
 
