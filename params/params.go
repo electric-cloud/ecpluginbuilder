@@ -36,6 +36,7 @@ type CommandLineArguments struct {
     PreserveBuild bool
     IsJar bool
     DependencyChunkSize int
+    PackedLib bool
 }
 
 type strslice []string
@@ -63,6 +64,7 @@ func GetCommandLineArguments() (args CommandLineArguments) {
     preserveBuildPtr := flag.Bool("preserve-build", true, "If set to false, an existing build directory will not be cleaned up")
     isJarPtr := flag.Bool("pack-jar", false, "If set to true, the .jar will be built instead of .zip")
     depChunkSizePtr := flag.Int("dependency-chunk-size", 1024 * 1024, "Dependencies chunk size in bytes (default it 1 MB)")
+    packedLib := flag.Bool("pack-lib", false, "If set to true, the lib/ folder will be packed into archive as is (without placing binaries into project.xml)")
 
     var folders strslice
     flag.Var(&folders, "folder", "List of folders to pack")
@@ -77,6 +79,7 @@ func GetCommandLineArguments() (args CommandLineArguments) {
     args.PreserveBuild = *preserveBuildPtr
     args.IsJar = *isJarPtr
     args.DependencyChunkSize = *depChunkSizePtr
+    args.PackedLib = *packedLib
 
     return
 }
@@ -199,10 +202,29 @@ func GetFoldersToPack(args CommandLineArguments) (folders []string, err error) {
         return
     }
     for _, f := range files {
-        if f.IsDir() && !strings.HasPrefix(f.Name(), ".") && f.Name() != "build" && f.Name() != "lib" {
+        if f.IsDir() && takeFolder(f.Name(), args) {
             folders = append(folders, f.Name())
         }
     }
+    return
+}
+
+
+func takeFolder(fname string, args CommandLineArguments) (retval bool) {
+    if strings.HasPrefix(fname, ".") {
+        retval = false
+        return
+    }
+
+    if fname == "build" {
+        retval = false
+        return
+    }
+    if fname == "lib" && args.PackedLib == false {
+        retval = false
+        return
+    }
+    retval = true
     return
 }
 

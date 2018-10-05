@@ -136,9 +136,9 @@ func packDependencies(pluginDir, pluginBuild string) (base64Depedencies string, 
 	if err != nil {
 		return
 	}
-	
+
     fmt.Println("Packed dependencies: " + packedFolder)
-	
+
     binaryContent, err := ioutil.ReadFile(packedFolder)
     if err != nil {
         return
@@ -175,6 +175,8 @@ func BuildProjectXML(pluginDir, pluginBuild, projectName string, placeholders ma
     for placeholder, value := range placeholders {
         escapedCode = strings.Replace(escapedCode, placeholder, value, -1)
     }
+
+
 
     dependencies, err := packDependencies(pluginDir, pluginBuild)
     if err != nil {
@@ -216,9 +218,12 @@ func BuildProjectXML(pluginDir, pluginBuild, projectName string, placeholders ma
             ProjectName: projectName,
             PropertySheet: PropertySheet{[]Property{
                 Property{Value: escapedCode, PropertyName: "ec_setup", Expandable: 0},
-                Property{PropertySheet: chunkedDependenciesStruct, PropertyName: "ec_groovyDependencies", Description: "Packed .jar dependencies"},
             }},
         },
+    }
+
+    if args.PackedLib == false {
+        exportedData.Project.PropertySheet.Property = append(exportedData.Project.PropertySheet.Property, Property{PropertySheet: chunkedDependenciesStruct, PropertyName: "ec_groovyDependencies", Description: "Packed .jar dependencies"})
     }
 
     out, err := xml.MarshalIndent(exportedData, "", "  ")
